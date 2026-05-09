@@ -69,3 +69,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 📜 License
 
 [MIT](LICENSE)
+
+---
+
+<p align="center">
+  Vibecoded with ❤️ by <a href="https://github.com/dortanes">dortanes</a>
+</p>
