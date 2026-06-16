@@ -1,4 +1,4 @@
-import { Bot } from "grammy";
+import { Bot, type BotError } from "grammy";
 import type {
   ActionHandler,
   ActionRef,
@@ -173,6 +173,17 @@ export class TelebotApp {
     this.config = options;
     this.rootMenu = options.menu;
     this.bot = new Bot<TelebotContext>(options.token);
+
+    // Global error boundary — prevents crashes from Grammy/Telegram API errors
+    this.bot.catch((err: BotError<TelebotContext>) => {
+      const e = err.error;
+      if (options.onError) {
+        options.onError(e, err.ctx);
+      } else {
+        console.error("[Telebot] Unhandled error:", e);
+      }
+    });
+
     this.installPromise = installMenu(this.bot, this.rootMenu, this.config);
   }
 
@@ -182,7 +193,10 @@ export class TelebotApp {
   async start(): Promise<void> {
     await this.installPromise;
     console.log("🤖 Telebot started");
-    await this.bot.start();
+    await this.bot.start({
+      onStart: () => {},
+      drop_pending_updates: true,
+    });
   }
 
   /**

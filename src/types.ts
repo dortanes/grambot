@@ -370,4 +370,6 @@ export interface TelebotConfig {
   translator?: Translator;
   /** Optional: custom storage for bot sessions */
   sessionStorage?: StorageAdapter<TelebotSession>;
+  /** Optional: custom error handler. If not set, errors are logged to console without crashing. */
+  onError?: (error: unknown, ctx: TelebotContext) => void;
 }

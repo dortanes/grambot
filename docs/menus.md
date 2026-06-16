@@ -59,6 +59,49 @@ The `layout.button(label)` method returns a `ButtonBuilder` with several configu
 - `.guard(fn)`: A function `(ctx) => boolean`. If it returns `false`, the button is completely hidden from the user.
 - `.default()`: Marks the button as the "fallback". If the user sends text that doesn't match any other button, this action is triggered.
 
+### Styling (Bot API 9.4+)
+
+- `.style(value)`: Sets the button color. Accepts `"danger"`, `"success"`, or `"primary"`.
+- `.danger()`: Shorthand for `.style("danger")` — red button. Use for destructive actions (delete, ban, cancel).
+- `.success()`: Shorthand for `.style("success")` — green button. Use for confirmations (confirm, pay, accept).
+- `.primary()`: Shorthand for `.style("primary")` — blue button. Use for highlighted/main actions.
+- `.icon(customEmojiId)`: Displays a custom emoji icon before the button text. The emoji must be owned by the bot owner (Telegram Premium required).
+
+## Button Styling
+
+Telebot supports colored buttons and custom emoji icons, introduced in Telegram Bot API 9.4 (February 2026).
+
+```ts
+Telebot.menu((layout) => {
+  layout.text("Are you sure you want to delete?");
+
+  layout.button("✅ Yes, delete").danger().action(deleteAction);
+  layout.button("Cancel").success().action(cancelAction);
+});
+```
+
+> **Note:** Button colors require Telegram clients that support Bot API 9.4+. Older clients will display standard-colored buttons. The styling is purely visual and does not affect button functionality.
+
+### Custom Emoji Icons
+
+You can display a custom emoji icon before the button text using `.icon()`:
+
+```ts
+layout.button("VIP Access").icon("5368324170671202286").action(vipAction);
+```
+
+To get a `custom_emoji_id`, send a custom emoji to your bot and read it from `message.entities`:
+
+```ts
+bot.on("message", (ctx) => {
+  for (const entity of ctx.message.entities ?? []) {
+    if (entity.type === "custom_emoji") {
+      console.log(entity.custom_emoji_id);
+    }
+  }
+});
+```
+
 ## Layout & Rows
 
 By default, Telebot places buttons in rows according to the `maxPerRow` setting.

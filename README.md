@@ -13,6 +13,7 @@ Telebot is designed for developers who want to build complex, menu-driven Telegr
 - 🔄 **Automatic Navigation**: Nested menus with built-in "Back" buttons.
 - 💬 **Linear Conversations**: Collect user input easily with `ask()` and `form()`.
 - 📝 **Single-Message Flow**: Edits the same message during interaction for a clean chat history.
+- 🎨 **Button Styling**: Color your buttons (danger, success, primary) and add custom emoji icons.
 - 🔡 **Type-Safe**: Written in TypeScript with full JSDoc documentation.
 - 🌐 **Localization Support**: Built-in hooks for i18n.
 - 🛠️ **Powered by Grammy**: Leverages the speed and reliability of the `grammy` framework.
@@ -38,8 +39,11 @@ const greetAction = Telebot.action(async ({ ctx, conversation }) => {
 
 // Define a menu
 const mainMenu = Telebot.menu((layout) => {
-  layout.text("Main Menu");
-  layout.button("Say Hello").action(greetAction);
+  layout.text("Welcome to the Bot! Choose an option:");
+
+  layout.button("👋 Say Hello").primary().action(greetAction);
+  layout.button("❌ Delete Account").danger().action(deleteAction);
+  layout.button("✅ Confirm").success().action(confirmAction);
   layout.button("External Link").url("https://github.com/dortanes/telebot");
 });
 
@@ -52,11 +56,30 @@ const bot = Telebot.create({
 bot.start();
 ```
 
+## 🎨 Button Styling
+
+Telebot supports button colors and custom emoji icons (Telegram Bot API 9.4+).
+
+```typescript
+// Color styles
+layout.button("Delete").danger();   // 🔴 Red
+layout.button("Confirm").success(); // 🟢 Green
+layout.button("Main").primary();    // 🔵 Blue
+
+// Or use .style() directly
+layout.button("Custom").style("danger");
+
+// Custom emoji icon before button text
+layout.button("Premium").icon("5368324170671202286");
+```
+
+> **Note:** Button colors require Telegram clients that support Bot API 9.4+ (February 2026+). Older clients will display normal buttons.
+
 ## 📖 Documentation
 
 Explore the detailed guides:
 
-- [Menus and Navigation](docs/menus.md) - Building layouts, rows, and buttons.
+- [Menus and Navigation](docs/menus.md) - Building layouts, rows, buttons, and styling.
 - [Conversations and Forms](docs/conversations.md) - Collecting user input and complex data.
 - [Actions and Triggers](docs/actions.md) - Logic, commands, and regex triggers.
 - [State Management](docs/state.md) - Sessions, storage, and user resolution.
