@@ -10,9 +10,9 @@ import type {
   FormFieldDefinition,
   AskFieldType,
   Translator,
-  ActionRef,
   MenuRef,
   ButtonActionHandler,
+  ButtonStyle,
   ParseMode,
   SayOptions,
 } from "../types.js";
@@ -31,6 +31,8 @@ class AskKeyboardButtonImpl implements AskKeyboardButton {
   _menu?: MenuRef;
   _payload?: Record<string, unknown>;
   _forceRow: boolean = false;
+  _style?: ButtonStyle;
+  _iconCustomEmojiId?: string;
 
   constructor(text: string) {
     this.text = text;
@@ -69,6 +71,28 @@ class AskKeyboardButtonImpl implements AskKeyboardButton {
 
   row(): AskKeyboardButton {
     this._forceRow = true;
+    return this;
+  }
+
+  style(value: ButtonStyle): AskKeyboardButton {
+    this._style = value;
+    return this;
+  }
+
+  danger(): AskKeyboardButton {
+    return this.style("danger");
+  }
+
+  success(): AskKeyboardButton {
+    return this.style("success");
+  }
+
+  primary(): AskKeyboardButton {
+    return this.style("primary");
+  }
+
+  icon(customEmojiId: string): AskKeyboardButton {
+    this._iconCustomEmojiId = customEmojiId;
     return this;
   }
 }
@@ -194,6 +218,8 @@ export function createConversationHelper(
         const btnId = btn._id ?? btn.text;
         const btnLabel = tr(btn.text, btn.text, opts.replace);
         inlineKb.text(btnLabel, `ask:${btnId}`);
+        if (btn._style) inlineKb.style(btn._style);
+        if (btn._iconCustomEmojiId) inlineKb.icon(btn._iconCustomEmojiId);
         currentInRow++;
       }
       const cancelText = tr("Grambot.cancel", "🚫 Cancel");
@@ -374,6 +400,8 @@ export function createConversationHelper(
         } else {
           kb.text(label, `ask:${btn._id ?? btn.text}`);
         }
+        if (btn._style) kb.style(btn._style);
+        if (btn._iconCustomEmojiId) kb.icon(btn._iconCustomEmojiId);
         currentInRow++;
       }
     }

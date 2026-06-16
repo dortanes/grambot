@@ -105,6 +105,16 @@ export interface AskKeyboardButton {
   payload(data: Record<string, unknown>): AskKeyboardButton;
   /** Force this button to be on a new row */
   row(): AskKeyboardButton;
+  /** Set a button color style (danger=red, success=green, primary=blue) */
+  style(value: ButtonStyle): AskKeyboardButton;
+  /** Shorthand for .style("danger") — red button */
+  danger(): AskKeyboardButton;
+  /** Shorthand for .style("success") — green button */
+  success(): AskKeyboardButton;
+  /** Shorthand for .style("primary") — blue button */
+  primary(): AskKeyboardButton;
+  /** Set a custom emoji icon displayed before the button text */
+  icon(customEmojiId: string): AskKeyboardButton;
 }
 
 /** Function to build an inline keyboard for the `ask` helper */

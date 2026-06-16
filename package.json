@@ -1,6 +1,6 @@
 {
   "name": "grambot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A framework for easily building push-button Telegram bots. From the simplest to the most complex.",
   "type": "module",
   "exports": {
@@ -13,7 +13,6 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "start:example": "tsx examples/example-project/main.ts",
     "prepublishOnly": "npm run build"
   },
   "repository": {
