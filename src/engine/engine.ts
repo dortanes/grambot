@@ -1,10 +1,10 @@
 import { Bot, InlineKeyboard, session } from "grammy";
 import { conversations, createConversation } from "@grammyjs/conversations";
 import type {
-  TelebotSession,
-  TelebotContext,
-  TelebotConversation,
-  TelebotConfig,
+  GrambotSession,
+  GrambotContext,
+  GrambotConversation,
+  GrambotConfig,
   MenuRef,
   ActionRef,
   ButtonConfig,
@@ -37,7 +37,7 @@ function pageKey(chatId: number, menuId: string, listIdx: number): string {
 // ─── Resolve dynamic label ─────────────────────────────────────────────────────
 
 /** @internal */
-function resolveLabel(config: ButtonConfig, ctx: TelebotContext, translator?: Translator): string {
+function resolveLabel(config: ButtonConfig, ctx: GrambotContext, translator?: Translator): string {
   if (typeof config.label === "function") {
     return config.label(ctx);
   }
@@ -47,7 +47,7 @@ function resolveLabel(config: ButtonConfig, ctx: TelebotContext, translator?: Tr
 // ─── Check guard ───────────────────────────────────────────────────────────────
 
 /** @internal */
-async function passesGuard(guard: GuardFn | undefined, ctx: TelebotContext): Promise<boolean> {
+async function passesGuard(guard: GuardFn | undefined, ctx: GrambotContext): Promise<boolean> {
   if (!guard) return true;
   return guard(ctx);
 }
@@ -109,7 +109,7 @@ async function collectMenuTree(
         actions.set(id, {
           id,
           handler: cfg.inlineHandler,
-          __telebot_action: true,
+          __Grambot_action: true,
           command() { return this; },
           word() { return this; },
           regexp() { return this; },
@@ -153,7 +153,7 @@ async function collectMenuTree(
 async function buildKeyboard(
   menuId: string,
   layout: LayoutBuilder,
-  ctx: TelebotContext,
+  ctx: GrambotContext,
   chatId: number,
   translator?: Translator,
   backToMenuId?: string,
@@ -338,7 +338,7 @@ async function buildKeyboard(
   // Always append back button if parent exists
   if (backToMenuId) {
     keyboard.row();
-    const backText = translator ? translator("telebot.back", ctx) : "◀️ Back";
+    const backText = translator ? translator("grambot.back", ctx) : "◀️ Back";
     keyboard.text(backText, `n:${backToMenuId}`);
   }
 
@@ -351,7 +351,7 @@ async function buildKeyboard(
 // ─── Engine ────────────────────────────────────────────────────────────────────
 
 /**
- * Installs the Telebot engine onto a Grammy bot.
+ * Installs the Grambot engine onto a Grammy bot.
  * 
  * - Registers session and conversation plugins.
  * - Resolves and registers all menus and actions.
@@ -362,9 +362,9 @@ async function buildKeyboard(
  * @param config - Framework configuration.
  */
 export async function installMenu(
-  bot: Bot<TelebotContext>,
+  bot: Bot<GrambotContext>,
   rootRef: MenuRef,
-  config: TelebotConfig,
+  config: GrambotConfig,
 ): Promise<void> {
   const menus = new Map<string, CollectedMenu>();
   const actions = new Map<string, ActionRef<any>>();
@@ -391,11 +391,11 @@ export async function installMenu(
   }
 
   // 1. Install Session Middleware (Required for Conversations)
-  bot.use(session<TelebotSession, TelebotContext>({
+  bot.use(session<GrambotSession, GrambotContext>({
     initial: () => ({ 
       conversation: {}, 
       originMenuId: undefined,
-      __telebot_payload: undefined, // Explicitly include for persistence safety
+      __Grambot_payload: undefined, // Explicitly include for persistence safety
     } as any),
     storage: config.sessionStorage,
   }));
@@ -406,7 +406,7 @@ export async function installMenu(
       try {
         ctx.user = await config.resolveUser(ctx) ?? {};
       } catch (e) {
-        console.error("[Telebot] Error in resolveUser middleware:", e);
+        console.error("[Grambot] Error in resolveUser middleware:", e);
         ctx.user = {};
       }
     } else {
@@ -421,8 +421,8 @@ export async function installMenu(
   // 3. Register Action Handlers as Conversations (MUST BE REGISTERED BEFORE usage in middleware below)
   for (const [actionId, actionRef] of actions) {
     const convBuilder = async (
-      conversation: TelebotConversation,
-      ctx: TelebotContext,
+      conversation: GrambotConversation,
+      ctx: GrambotContext,
     ) => {
       // 1. Resolve payload
       // Priority: 
@@ -432,12 +432,12 @@ export async function installMenu(
       // D. Callback data (first run button trigger)
       // E. Manual re-matching (last resort fallback)
 
-      let payload = (conversation as any).session?.__telebot_payload;
+      let payload = (conversation as any).session?.__Grambot_payload;
 
       if (payload === undefined) {
         const session = ctx.session as any;
-        if (session?.__telebot_payload !== undefined) {
-          payload = session.__telebot_payload;
+        if (session?.__Grambot_payload !== undefined) {
+          payload = session.__Grambot_payload;
         }
       }
 
@@ -478,24 +478,24 @@ export async function installMenu(
       if (payload !== undefined) {
         const convSession = (conversation as any).session;
         if (convSession) {
-          if (convSession.__telebot_payload === undefined) {
-            convSession.__telebot_payload = payload;
+          if (convSession.__Grambot_payload === undefined) {
+            convSession.__Grambot_payload = payload;
           }
         } else {
-          (conversation as any).session = { __telebot_payload: payload };
+          (conversation as any).session = { __Grambot_payload: payload };
         }
       }
 
       const navigate = async (menu?: MenuRef) => {
         const targetId = menu ? menu.id : rootRef.id;
-        const targetMessageId = (conversation as any).session?.__telebot_last_msg_id;
+        const targetMessageId = (conversation as any).session?.__Grambot_last_msg_id;
         await conversation.external(async (c) => {
           // Re-resolve user to pick up changes made during the action (e.g. language change)
           if (config.resolveUser) {
             try {
               c.user = await config.resolveUser(c) ?? {};
             } catch (e) {
-              console.error("[Telebot] Error re-resolving user during navigation:", e);
+              console.error("[Grambot] Error re-resolving user during navigation:", e);
             }
           }
           await renderMenu(targetId, c, c.chat!.id, true, undefined, targetMessageId);
@@ -511,7 +511,7 @@ export async function installMenu(
           try {
             ctx.user = await config.resolveUser(ctx) ?? {};
           } catch (e) {
-            console.error("[Telebot] Error in resolveUser inside conversation:", e);
+            console.error("[Grambot] Error in resolveUser inside conversation:", e);
             ctx.user = {};
           }
         } else {
@@ -544,7 +544,7 @@ export async function installMenu(
             payload, // Pass current action payload for inheritance
           );
 
-          const messageToEdit = (conversation as any).session?.__telebot_last_msg_id ?? ctx.callbackQuery?.message?.message_id;
+          const messageToEdit = (conversation as any).session?.__Grambot_last_msg_id ?? ctx.callbackQuery?.message?.message_id;
           const isPhotoMessage = !!ctx.callbackQuery?.message && "photo" in ctx.callbackQuery.message;
 
           await internalRenderLayout(
@@ -562,18 +562,18 @@ export async function installMenu(
         }
       } catch (e) {
         const err = e as Error;
-        if (err.message === "TELEBOT_EXTERNAL") {
+        if (err.message === "Grambot_EXTERNAL") {
           return; // Exit silently, let next middleware take over
         }
         throw e;
       }
     };
 
-    const convId = `telebot_${actionId}`;
+    const convId = `Grambot_${actionId}`;
     try {
         bot.use(createConversation(convBuilder, { id: convId }));
     } catch (e) {
-        console.error(`Telebot Error: Failed to register conversation ${convId}`, e);
+        console.error(`Grambot Error: Failed to register conversation ${convId}`, e);
     }
   }
 
@@ -606,11 +606,11 @@ export async function installMenu(
         if (originMenuId === "" || originMenuId === "undefined") originMenuId = undefined;
         if (ctx.session) ctx.session.originMenuId = originMenuId;
         
-        const conversationId = `telebot_${actionId}`;
+        const conversationId = `Grambot_${actionId}`;
         try {
           await ctx.conversation.enter(conversationId);
         } catch (e) {
-          console.error(`Telebot Error: Failed to enter conversation ${conversationId}:`, e);
+          console.error(`Grambot Error: Failed to enter conversation ${conversationId}:`, e);
           await ctx.answerCallbackQuery("Action prevented. See logs.");
           await renderMenu(rootRef.id, ctx, ctx.chat!.id);
           return;
@@ -622,14 +622,14 @@ export async function installMenu(
   // 5. Register Text Triggers (Commands, Words, Regexps)
   
   // Helper to enter action conversation
-  const enterAction = async (ctx: TelebotContext, actionId: string, payload?: any) => {
+  const enterAction = async (ctx: GrambotContext, actionId: string, payload?: any) => {
     if (ctx.session) {
       ctx.session.originMenuId = undefined; // Triggered via text, no origin menu
       // Store payload in session temporarily so the conversation builder can access it
       // @ts-ignore: custom property for internal use
-      ctx.session.__telebot_payload = payload;
+      ctx.session.__Grambot_payload = payload;
     }
-    await ctx.conversation.enter(`telebot_${actionId}`);
+    await ctx.conversation.enter(`Grambot_${actionId}`);
     return true; // Mark as handled
   };
 
@@ -640,12 +640,12 @@ export async function installMenu(
 
     if (commands) {
       for (const cmd of commands) {
-        bot.command(cmd, async (ctx) => { if (await enterAction(ctx as TelebotContext, actionId)) return; });
+        bot.command(cmd, async (ctx) => { if (await enterAction(ctx as GrambotContext, actionId)) return; });
       }
     }
     if (words) {
       for (const word of words) {
-        bot.hears(word, async (ctx) => { if (await enterAction(ctx as TelebotContext, actionId)) return; });
+        bot.hears(word, async (ctx) => { if (await enterAction(ctx as GrambotContext, actionId)) return; });
       }
     }
     if (regexps) {
@@ -656,7 +656,7 @@ export async function installMenu(
           if (match && match.length > 1) {
             payload = { id: parseInt(match[1], 10) || match[1] };
           }
-          if (await enterAction(ctx as TelebotContext, actionId, payload)) return;
+          if (await enterAction(ctx as GrambotContext, actionId, payload)) return;
         });
       }
     }
@@ -667,23 +667,23 @@ export async function installMenu(
     if (!collected.ref.triggers) continue;
     const { commands, words, regexps } = collected.ref.triggers;
 
-    const showMenu = async (ctx: TelebotContext) => {
+    const showMenu = async (ctx: GrambotContext) => {
       await renderMenu(menuId, ctx, ctx.chat!.id);
     };
 
     if (commands) {
       for (const cmd of commands) {
-        bot.command(cmd, (ctx) => showMenu(ctx as TelebotContext));
+        bot.command(cmd, (ctx) => showMenu(ctx as GrambotContext));
       }
     }
     if (words) {
       for (const word of words) {
-        bot.hears(word, (ctx) => showMenu(ctx as TelebotContext));
+        bot.hears(word, (ctx) => showMenu(ctx as GrambotContext));
       }
     }
     if (regexps) {
       for (const re of regexps) {
-        bot.hears(re, (ctx) => showMenu(ctx as TelebotContext));
+        bot.hears(re, (ctx) => showMenu(ctx as GrambotContext));
       }
     }
   }
@@ -692,7 +692,7 @@ export async function installMenu(
 
   async function renderMenu(
     menuId: string, 
-    ctx: TelebotContext, 
+    ctx: GrambotContext, 
     chatId: number, 
     edit: boolean = false, 
     prebuiltLayout?: LayoutBuilder,
@@ -739,7 +739,7 @@ export async function installMenu(
     keyboard: InlineKeyboard,
     parseMode: ParseMode | undefined,
     imageUrl: string | undefined,
-    ctx: TelebotContext,
+    ctx: GrambotContext,
     edit: boolean,
     messageToEdit: number | undefined,
     isPhotoMessage: boolean,
@@ -791,7 +791,7 @@ export async function installMenu(
 
     if (ctx.session) ctx.session.conversation = {};
     const chatId = ctx.chat!.id;
-    await renderMenu(rootRef.id, ctx as TelebotContext, chatId, false);
+    await renderMenu(rootRef.id, ctx as GrambotContext, chatId, false);
   });
 
   bot.on("message", async (ctx) => {
@@ -799,7 +799,7 @@ export async function installMenu(
       if (Object.keys(active).length > 0) return;
       
       if (ctx.chat.type === "private") {
-        await renderMenu(rootRef.id, ctx as TelebotContext, ctx.chat.id, false);
+        await renderMenu(rootRef.id, ctx as GrambotContext, ctx.chat.id, false);
       }
   });
 
@@ -816,7 +816,7 @@ export async function installMenu(
     if (data.startsWith("n:")) {
       const targetMenuId = data.slice(2);
       const chatId = ctx.chat!.id;
-      await renderMenu(targetMenuId, ctx as TelebotContext, chatId, true);
+      await renderMenu(targetMenuId, ctx as GrambotContext, chatId, true);
       await ctx.answerCallbackQuery();
       return;
     }
@@ -829,7 +829,7 @@ export async function installMenu(
       const chatId = ctx.chat!.id;
       
       pageState.set(pageKey(chatId, menuIdStr, parseInt(listIdxStr, 10)), newPage);
-      await renderMenu(menuIdStr, ctx as TelebotContext, chatId, true);
+      await renderMenu(menuIdStr, ctx as GrambotContext, chatId, true);
       await ctx.answerCallbackQuery();
       return;
     }
@@ -837,7 +837,7 @@ export async function installMenu(
     if (data.startsWith("r:")) {
       const menuIdStr = data.slice(2);
       const chatId = ctx.chat!.id;
-      await renderMenu(menuIdStr, ctx as TelebotContext, chatId, true);
+      await renderMenu(menuIdStr, ctx as GrambotContext, chatId, true);
       await ctx.answerCallbackQuery();
       return;
     }
@@ -850,7 +850,7 @@ export async function installMenu(
        if (!menu) return;
 
        const freshLayout = new LayoutBuilder();
-       await menu.ref.builder(freshLayout, ctx as TelebotContext);
+       await menu.ref.builder(freshLayout, ctx as GrambotContext);
 
        for (const el of freshLayout._elements) {
          if (el.kind === "button") {
@@ -866,7 +866,7 @@ export async function installMenu(
        }
        
        const chatId = ctx.chat!.id;
-       await renderMenu(menuIdStr, ctx as TelebotContext, chatId, true, freshLayout);
+       await renderMenu(menuIdStr, ctx as GrambotContext, chatId, true, freshLayout);
        await ctx.answerCallbackQuery();
        return;
     }
@@ -901,22 +901,22 @@ export async function installMenu(
        const idVal = (payload && typeof payload === "object" && "id" in payload) ? String(payload.id) : (payload !== undefined && payload !== null ? String(payload) : "");
        
        const navigate = async (menu?: MenuRef) => {
-         await renderMenu(menu?.id || rootRef.id, ctx as TelebotContext, ctx.chat!.id, true);
+         await renderMenu(menu?.id || rootRef.id, ctx as GrambotContext, ctx.chat!.id, true);
        };
 
        const mockConv = { 
          session: ctx.session,
          external: (fn: any) => fn(ctx),
        } as any;
-       const conversationHelper = createConversationHelper(mockConv, ctx as TelebotContext, config.translator, navigate);
+       const conversationHelper = createConversationHelper(mockConv, ctx as GrambotContext, config.translator, navigate);
 
        // Execute parent action purely to find the button
        await action.handler({
-         ctx: ctx as TelebotContext,
+         ctx: ctx as GrambotContext,
          payload: payload || {},
          id: idVal,
          conversation: conversationHelper,
-         ui: createUIHelper(ctx as TelebotContext),
+         ui: createUIHelper(ctx as GrambotContext),
          layout,
          navigate,
        });
@@ -939,11 +939,11 @@ export async function installMenu(
          await ctx.answerCallbackQuery();
          const subLayout = new LayoutBuilder();
          await btn._config.inlineHandler({
-           ctx: ctx as TelebotContext,
+           ctx: ctx as GrambotContext,
            payload: payload || {}, // inherit payload
            id: idVal,
            conversation: conversationHelper,
-           ui: createUIHelper(ctx as TelebotContext),
+           ui: createUIHelper(ctx as GrambotContext),
            layout: subLayout,
            navigate,
          });
@@ -953,7 +953,7 @@ export async function installMenu(
             const { text, keyboard, parseMode, imageUrl } = await buildKeyboard(
               originActionId,
               subLayout,
-              ctx as TelebotContext,
+              ctx as GrambotContext,
               ctx.chat!.id,
               config.translator,
               undefined, // backToMenuId
@@ -969,7 +969,7 @@ export async function installMenu(
                 keyboard,
                 parseMode,
                 imageUrl,
-                ctx as TelebotContext,
+                ctx as GrambotContext,
                 true,
                 messageToEdit,
                 isPhotoMessage,
@@ -997,13 +997,13 @@ export async function installMenu(
  * @param bot - The grammy bot instance.
  * @param chatId - Target chat ID.
  * @param menuRef - The menu to send.
- * @param ctx - Current telebot context.
+ * @param ctx - Current Grambot context.
  */
 export async function sendMenu(
-  bot: Bot<TelebotContext>,
+  bot: Bot<GrambotContext>,
   chatId: number,
   menuRef: MenuRef,
-  ctx: TelebotContext,
+  ctx: GrambotContext,
   translator?: Translator,
 ): Promise<void> {
   const layout = new LayoutBuilder();

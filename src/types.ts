@@ -9,12 +9,12 @@ import type { Conversation, ConversationFlavor } from "@grammyjs/conversations";
  * Extend this interface via declaration merging to type `ctx.user`:
  *
  * ```ts
- * declare module "telebot" {
- *   interface TelebotUser { isAdmin: boolean; balance: number; }
+ * declare module "Grambot" {
+ *   interface GrambotUser { isAdmin: boolean; balance: number; }
  * }
  * ```
  */
-export interface TelebotUser {
+export interface GrambotUser {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
@@ -22,9 +22,9 @@ export interface TelebotUser {
 import type { SessionFlavor } from "grammy";
 
 /**
- * Internal session structure used by Telebot.
+ * Internal session structure used by Grambot.
  */
-export interface TelebotSession {
+export interface GrambotSession {
   /** Data for @grammyjs/conversations */
   conversation: object;
   /** Tracks the origin menu to handle "back" navigation and updates */
@@ -36,20 +36,20 @@ export interface TelebotSession {
  * Extends Grammy's Context with a typed `user` property.
  * Includes SessionFlavor for conversation support.
  */
-export type TelebotContext = ConversationFlavor<Context & SessionFlavor<TelebotSession> & {
+export type GrambotContext = ConversationFlavor<Context & SessionFlavor<GrambotSession> & {
   /** The current user, resolved via `resolveUser` config or defaults */
-  user: TelebotUser;
+  user: GrambotUser;
 }>;
 
 /**
  * Context for callback query updates (button clicks).
  */
-export type TelebotCallbackContext = CallbackQueryContext<TelebotContext>;
+export type GrambotCallbackContext = CallbackQueryContext<GrambotContext>;
 
 /**
  * Type for conversation handlers.
  */
-export type TelebotConversation = Conversation<TelebotContext, TelebotContext>;
+export type GrambotConversation = Conversation<GrambotContext, GrambotContext>;
 
 // ─── Formatting ───────────────────────────────────────────────────────────────
 
@@ -172,7 +172,7 @@ export interface UIHelper {
 /** Context passed to action handlers */
 export interface ActionContext<P = undefined> {
   /** Grammy context */
-  ctx: TelebotContext;
+  ctx: GrambotContext;
   /** Custom data passed to this action */
   payload: P;
   /** Conversation manager */
@@ -195,19 +195,19 @@ export type ActionHandler<P = undefined> = (
 // ─── Menu / Layout ─────────────────────────────────────────────────────────────
 
 /** A function used to conditionally show or hide elements */
-export type GuardFn = (ctx: TelebotContext) => boolean | Promise<boolean>;
+export type GuardFn = (ctx: GrambotContext) => boolean | Promise<boolean>;
 
 /** A string or a function that returns a string based on context */
 export type DynamicLabel =
   | string
-  | ((ctx: TelebotContext) => string);
+  | ((ctx: GrambotContext) => string);
 
 /** Action handler for a button click */
 export type ButtonActionHandler = ActionHandler<any> | ActionRef<any>;
 
 /** A reference to a registered action */
 export interface ActionRef<P = undefined> {
-  __telebot_action: true;
+  __Grambot_action: true;
   /** Unique action ID */
   id: string;
   /** The actual handler function */
@@ -256,11 +256,11 @@ export interface ButtonConfig {
 
 /** A reference to a registered menu */
 export interface MenuRef {
-  __telebot_menu: true;
+  __Grambot_menu: true;
   /** Unique menu ID */
   id: string;
   /** Function that defines the menu layout */
-  builder: (layout: LayoutBuilderInterface, ctx: TelebotContext) => void | Promise<void>;
+  builder: (layout: LayoutBuilderInterface, ctx: GrambotContext) => void | Promise<void>;
   /** Triggers that can open this menu globally */
   triggers?: {
     commands?: string[];
@@ -358,18 +358,18 @@ export interface ListBuilderInterface<T> {
 // ─── Engine config ─────────────────────────────────────────────────────────────
 
 /** Function for localizing strings */
-export type Translator = (key: string, ctx: TelebotContext, options?: Record<string, any>) => string;
+export type Translator = (key: string, ctx: GrambotContext, options?: Record<string, any>) => string;
 
-/** Main configuration for TelebotApp */
-export interface TelebotConfig {
+/** Main configuration for GrambotApp */
+export interface GrambotConfig {
   /** Bot token from @BotFather */
   token: string;
-  /** Optional: resolve the TelebotUser from ctx (e.g., DB lookup) */
-  resolveUser?: (ctx: Context) => TelebotUser | Promise<TelebotUser>;
+  /** Optional: resolve the GrambotUser from ctx (e.g., DB lookup) */
+  resolveUser?: (ctx: Context) => GrambotUser | Promise<GrambotUser>;
   /** Optional: translator function for internal strings */
   translator?: Translator;
   /** Optional: custom storage for bot sessions */
-  sessionStorage?: StorageAdapter<TelebotSession>;
+  sessionStorage?: StorageAdapter<GrambotSession>;
   /** Optional: custom error handler. If not set, errors are logged to console without crashing. */
-  onError?: (error: unknown, ctx: TelebotContext) => void;
+  onError?: (error: unknown, ctx: GrambotContext) => void;
 }

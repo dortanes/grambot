@@ -14,7 +14,7 @@ export function getGlobalActions(): ActionRef<any>[] {
 /**
  * Creates a typed action reference.
  * 
- * Use `Telebot.action<PayloadType>(handler)` to define reusable handlers
+ * Use `Grambot.action<PayloadType>(handler)` to define reusable handlers
  * that can be attached to buttons.
  * 
  * @param handler - The function that handles the action logic.
@@ -24,7 +24,7 @@ export function createAction<P = undefined>(
   handler: ActionHandler<P>,
 ): ActionRef<P> {
   const ref: ActionRef<P> = {
-    __telebot_action: true,
+    __Grambot_action: true,
     id: `a${randomUUID().slice(0, 6)}`,
     handler,
     triggers: {},

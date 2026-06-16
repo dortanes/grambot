@@ -1,100 +1,126 @@
-# 🤖 Telebot
+<table>
+<tr>
+<td>
 
-**The declarative framework for building push-button Telegram bots with ease.**
+## Grambot
 
-Telebot is designed for developers who want to build complex, menu-driven Telegram bots without the boilerplate. It provides a fluent, declarative API for menus, automatic navigation, and streamlined conversations.
+[![NPM Version](https://img.shields.io/npm/v/grambot)](https://www.npmjs.com/package/grambot) [![License](https://img.shields.io/npm/l/grambot)](LICENSE)
 
-[![NPM Version](https://img.shields.io/npm/v/@superpackages/telebot.svg)](https://www.npmjs.com/package/@superpackages/telebot)
-[![License](https://img.shields.io/npm/l/@superpackages/telebot.svg)](LICENSE)
+</td>
+</tr>
+</table>
 
-## ✨ Features
+A declarative framework for building menu-driven Telegram bots. No boilerplate — just menus, buttons, and conversations.
 
-- 🏗️ **Declarative Menus**: Define your bot's layout using a fluent builder API.
-- 🔄 **Automatic Navigation**: Nested menus with built-in "Back" buttons.
-- 💬 **Linear Conversations**: Collect user input easily with `ask()` and `form()`.
-- 📝 **Single-Message Flow**: Edits the same message during interaction for a clean chat history.
-- 🎨 **Button Styling**: Color your buttons (danger, success, primary) and add custom emoji icons.
-- 🔡 **Type-Safe**: Written in TypeScript with full JSDoc documentation.
-- 🌐 **Localization Support**: Built-in hooks for i18n.
-- 🛠️ **Powered by Grammy**: Leverages the speed and reliability of the `grammy` framework.
+[Install](#-install) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Releases](https://github.com/dortanes/grambot/releases)
+
+---
+
+## 📦 Install
+
+```bash
+npm install grambot grammy
+```
 
 ## 🚀 Quick Start
 
-### 1. Install
-
-```bash
-npm install @superpackages/telebot grammy
-```
-
-### 2. Create your bot
-
 ```typescript
-import { Telebot } from "@superpackages/telebot";
+import { Grambot } from "grambot";
 
-// Define an action
-const greetAction = Telebot.action(async ({ ctx, conversation }) => {
+const greetAction = Grambot.action(async ({ conversation }) => {
   const name = await conversation.ask("What is your name?");
-  await ctx.reply(`Hello, ${name}! Welcome to the bot.`);
+  await conversation.say(`Hello, ${name}!`);
 });
 
-// Define a menu
-const mainMenu = Telebot.menu((layout) => {
-  layout.text("Welcome to the Bot! Choose an option:");
-
+const mainMenu = Grambot.menu((layout) => {
+  layout.text("Welcome! Choose an option:");
   layout.button("👋 Say Hello").primary().action(greetAction);
-  layout.button("❌ Delete Account").danger().action(deleteAction);
-  layout.button("✅ Confirm").success().action(confirmAction);
-  layout.button("External Link").url("https://github.com/dortanes/telebot");
+  layout.button("🌐 Website").url("https://github.com/dortanes/grambot");
 });
 
-// Start the bot
-const bot = Telebot.create({
-  token: "YOUR_BOT_TOKEN",
+const bot = Grambot.create({
+  token: process.env.BOT_TOKEN!,
   menu: mainMenu,
 });
 
 bot.start();
 ```
 
+## ✨ Features
+
+|     | Feature                 | Description                                              |
+| --- | ----------------------- | -------------------------------------------------------- |
+| 🏗️  | **Declarative Menus**   | Define layouts with a fluent builder API                 |
+| 🔄  | **Auto Navigation**     | Nested menus with built-in "Back" buttons                |
+| 💬  | **Conversations**       | Collect input with `ask()` and `form()`                  |
+| 📝  | **Single-Message Flow** | Edits one message for a clean chat history               |
+| 🎨  | **Button Styling**      | Colors (danger, success, primary) and custom emoji icons |
+| 🛡️  | **Error Handling**      | Built-in error boundary — no crashes                     |
+| 🌐  | **i18n Support**        | Localization hooks for all internal strings              |
+| 🔡  | **Type-Safe**           | Full TypeScript with JSDoc                               |
+
 ## 🎨 Button Styling
 
-Telebot supports button colors and custom emoji icons (Telegram Bot API 9.4+).
+Color your buttons and add custom emoji icons (Bot API 9.4+):
 
 ```typescript
-// Color styles
-layout.button("Delete").danger();   // 🔴 Red
+layout.button("Delete").danger(); // 🔴 Red
 layout.button("Confirm").success(); // 🟢 Green
-layout.button("Main").primary();    // 🔵 Blue
+layout.button("Highlight").primary(); // 🔵 Blue
 
-// Or use .style() directly
-layout.button("Custom").style("danger");
-
-// Custom emoji icon before button text
-layout.button("Premium").icon("5368324170671202286");
+layout.button("VIP").icon("custom_emoji_id");
 ```
 
-> **Note:** Button colors require Telegram clients that support Bot API 9.4+ (February 2026+). Older clients will display normal buttons.
+## ⚙️ Configuration
+
+```typescript
+const bot = Grambot.create({
+  token: "BOT_TOKEN",
+  menu: mainMenu,
+
+  // Resolve user data from DB on every update
+  resolveUser: async (ctx) => {
+    return await db.users.find(ctx.from.id);
+  },
+
+  // Localize internal strings
+  translator: (key, ctx) => i18n.t(ctx.from.language_code, key),
+
+  // Custom error handler (default: console.error)
+  onError: (error, ctx) => {
+    logger.error("Bot error", { error, chatId: ctx.chat?.id });
+  },
+});
+```
 
 ## 📖 Documentation
 
-Explore the detailed guides:
+| Guide                                            | Description                                 |
+| ------------------------------------------------ | ------------------------------------------- |
+| [Menus and Navigation](docs/menus.md)            | Layouts, rows, buttons, styling, pagination |
+| [Conversations and Forms](docs/conversations.md) | User input, validation, multi-step forms    |
+| [Actions and Triggers](docs/actions.md)          | Commands, regex, inline handlers            |
+| [State Management](docs/state.md)                | Sessions, storage adapters, user resolution |
+| [Advanced Patterns](docs/advanced.md)            | i18n, webhooks, manual rendering            |
 
-- [Menus and Navigation](docs/menus.md) - Building layouts, rows, buttons, and styling.
-- [Conversations and Forms](docs/conversations.md) - Collecting user input and complex data.
-- [Actions and Triggers](docs/actions.md) - Logic, commands, and regex triggers.
-- [State Management](docs/state.md) - Sessions, storage, and user resolution.
-- [Advanced Patterns](docs/advanced.md) - I18n, custom storage, and manual rendering.
+## Development
 
-## 🤝 Contributing
+```bash
+git clone https://github.com/dortanes/grambot.git
+cd grambot
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+npm install
 
-## 📜 License
+npm run build
+
+BOT_TOKEN=your_token npm run start:example
+```
+
+## License
 
 [MIT](LICENSE)
 
----
-
-<p align="center">
-  Vibecoded with ❤️ by <a href="https://github.com/dortanes">dortanes</a>
+<p align="center" style="margin-top: 40px">
+  Made with ❤️ by <a href="https://github.com/dortanes">dortanes</a><br/>
+  (pls star this repo if you find it useful)
 </p>

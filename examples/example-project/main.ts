@@ -1,4 +1,4 @@
-import { Telebot } from "../../src/index.js";
+import { Grambot } from "../../src/index.js";
 import mainMenu from "./scenario.js";
 
 /**
@@ -8,13 +8,13 @@ import mainMenu from "./scenario.js";
 class I18n {
   t(key: string): string {
     const table: Record<string, string> = {
-      "telebot.back": "🔙 Back",
-      "telebot.cancel": "❌ Cancel",
-      "telebot.conversation.use_buttons": "Please use the buttons provided.",
-      "telebot.conversation.photo_error": "Please send a photo.",
-      "telebot.conversation.text_error": "Please send text.",
-      "telebot.conversation.number_error": "Please enter a valid number.",
-      "telebot.conversation.invalid_error": "Invalid input.",
+      "grambot.back": "🔙 Back",
+      "grambot.cancel": "❌ Cancel",
+      "grambot.conversation.use_buttons": "Please use the buttons provided.",
+      "grambot.conversation.photo_error": "Please send a photo.",
+      "grambot.conversation.text_error": "Please send text.",
+      "grambot.conversation.number_error": "Please enter a valid number.",
+      "grambot.conversation.invalid_error": "Invalid input.",
     };
     return table[key] || key;
   }
@@ -33,13 +33,13 @@ if (!token) {
   process.exit(1);
 }
 
-console.log("🚀 Initializing Telebot example project...");
+console.log("🚀 Initializing Grambot example project...");
 
 /**
- * Initialize the Telebot application.
+ * Initialize the Grambot application.
  * This sets up the core engine, main menu scenario, and global handlers.
  */
-const app = Telebot.create({
+const app = Grambot.create({
   token,
   menu: mainMenu,
 
@@ -65,7 +65,7 @@ const app = Telebot.create({
  * Captures and logs errors from the Telegraf instance.
  */
 app.bot.catch((err) => {
-  console.error("⚠️ Telebot error caught:", err);
+  console.error("⚠️ Grambot error caught:", err);
 });
 
 /**

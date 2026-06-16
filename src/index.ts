@@ -1,23 +1,23 @@
 /**
- * @module Telebot
- * @description Main entry point for the Telebot framework.
+ * @module Grambot
+ * @description Main entry point for the Grambot framework.
  */
 
 // ─── Public API ────────────────────────────────────────────────────────────────
 
 // Main entry point
-export { Telebot, TelebotApp } from "./telebot.js";
+export { Grambot, GrambotApp } from "./grambot.js";
 
 /**
  * @namespace Types
  * @description Core types and interfaces used throughout the framework.
  */
 export type {
-  TelebotContext,
-  TelebotCallbackContext,
-  TelebotConversation,
-  TelebotUser,
-  TelebotConfig,
+  GrambotContext,
+  GrambotCallbackContext,
+  GrambotConversation,
+  GrambotUser,
+  GrambotConfig,
   ActionRef,
   ActionHandler,
   ActionContext,

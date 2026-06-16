@@ -1,7 +1,7 @@
 import { InlineKeyboard } from "grammy";
 import type {
-  TelebotContext,
-  TelebotConversation,
+  GrambotContext,
+  GrambotConversation,
   ConversationHelper,
   AskOptions,
   AskKeyboardBuilder,
@@ -106,14 +106,14 @@ function isFunction(value: unknown): value is (...args: any[]) => any {
  * It manages message editing, input validation, and cancellation.
  * 
  * @param conversation - The grammy conversation instance.
- * @param ctx - The initial telebot context.
+ * @param ctx - The initial Grambot context.
  * @param translator - Optional function for localizing internal strings.
  * @returns A {@link ConversationHelper} object.
  * @internal
  */
 export function createConversationHelper(
-  conversation: TelebotConversation,
-  ctx: TelebotContext,
+  conversation: GrambotConversation,
+  ctx: GrambotContext,
   translator?: Translator,
   navigate?: (menu?: any) => Promise<void>,
 ): ConversationHelper {
@@ -122,7 +122,7 @@ export function createConversationHelper(
     translator ? translator(key, ctx, options) : defaultText;
   
   // Track the last bot message ID to edit it
-  let lastMessageId: number | undefined = (conversation as any).session?.__telebot_last_msg_id ?? ctx.callbackQuery?.message?.message_id;
+  let lastMessageId: number | undefined = (conversation as any).session?.__Grambot_last_msg_id ?? ctx.callbackQuery?.message?.message_id;
   const chatId = ctx.chat?.id;
 
   /**
@@ -149,7 +149,7 @@ export function createConversationHelper(
     
     const conv = conversation as any;
     if (!conv.session) conv.session = {};
-    conv.session.__telebot_last_msg_id = lastMessageId;
+    conv.session.__Grambot_last_msg_id = lastMessageId;
   }
 
 
@@ -196,7 +196,7 @@ export function createConversationHelper(
         inlineKb.text(btnLabel, `ask:${btnId}`);
         currentInRow++;
       }
-      const cancelText = tr("telebot.cancel", "🚫 Cancel");
+      const cancelText = tr("Grambot.cancel", "🚫 Cancel");
       inlineKb.row().text(cancelText, "ask:__cancel__");
 
       await editOrReply(translatedQuestion, inlineKb, opts.parseMode);
@@ -204,7 +204,7 @@ export function createConversationHelper(
       const cbCtx = await conversation.waitForCallbackQuery(/^ask:/, {
         otherwise: async (c) => {
             try { await c.deleteMessage(); } catch {}
-            await c.answerCallbackQuery(tr("telebot.conversation.use_buttons", "Please use the buttons above."));
+            await c.answerCallbackQuery(tr("Grambot.conversation.use_buttons", "Please use the buttons above."));
         },
       });
       await cbCtx.answerCallbackQuery();
@@ -221,7 +221,7 @@ export function createConversationHelper(
     // Branch 2: text / number / photo input
     const fieldType: AskFieldType = opts.type ?? "text";
 
-    const cancelText = tr("telebot.cancel", "🚫 Cancel");
+    const cancelText = tr("Grambot.cancel", "🚫 Cancel");
     const cancelKb = new InlineKeyboard().text(cancelText, "cancel_conversation");
 
     let currentPrompt = translatedQuestion;
@@ -244,7 +244,7 @@ export function createConversationHelper(
 
             if (!updateCtx.message?.photo) {
                 try { await updateCtx.deleteMessage(); } catch {}
-                const err = opts.errorMessage ? tr(opts.errorMessage, opts.errorMessage, opts.replace) : tr("telebot.conversation.photo_error", "Please send a photo.");
+                const err = opts.errorMessage ? tr(opts.errorMessage, opts.errorMessage, opts.replace) : tr("Grambot.conversation.photo_error", "Please send a photo.");
                 currentPrompt = `${err}\n\n${translatedQuestion}`;
                 isError = true;
                 continue;
@@ -256,7 +256,7 @@ export function createConversationHelper(
             if (photos && photos.length > 0) {
               const val = photos[photos.length - 1]!.file_id;
               if (opts.validate && !(await opts.validate(val as unknown as T))) {
-                const err = opts.errorMessage ? tr(opts.errorMessage, opts.errorMessage, opts.replace) : tr("telebot.conversation.invalid_error", "Invalid input. Try again.");
+                const err = opts.errorMessage ? tr(opts.errorMessage, opts.errorMessage, opts.replace) : tr("Grambot.conversation.invalid_error", "Invalid input. Try again.");
                 currentPrompt = `${err}\n\n${translatedQuestion}`;
                 isError = true;
                 continue;
@@ -276,7 +276,7 @@ export function createConversationHelper(
 
         if (!updateCtx.message?.text) {
             try { await updateCtx.deleteMessage(); } catch {}
-            const err = opts.errorMessage ? tr(opts.errorMessage, opts.errorMessage, opts.replace) : tr("telebot.conversation.text_error", "Please send a text message.");
+            const err = opts.errorMessage ? tr(opts.errorMessage, opts.errorMessage, opts.replace) : tr("Grambot.conversation.text_error", "Please send a text message.");
             currentPrompt = `${err}\n\n${translatedQuestion}`;
             isError = true;
             continue;
@@ -289,13 +289,13 @@ export function createConversationHelper(
         if (fieldType === "number") {
             const n = Number(raw);
             if (Number.isNaN(n)) {
-                const err = opts.errorMessage ? tr(opts.errorMessage, opts.errorMessage, opts.replace) : tr("telebot.conversation.number_error", "Please send a valid number.");
+                const err = opts.errorMessage ? tr(opts.errorMessage, opts.errorMessage, opts.replace) : tr("Grambot.conversation.number_error", "Please send a valid number.");
                 currentPrompt = `${err}\n\n${translatedQuestion}`;
                 isError = true;
                 continue;
             }
             if (opts.validate && !(await opts.validate(n as unknown as T))) {
-                const err = opts.errorMessage ? tr(opts.errorMessage, opts.errorMessage, opts.replace) : tr("telebot.conversation.invalid_error", "Invalid input. Try again.");
+                const err = opts.errorMessage ? tr(opts.errorMessage, opts.errorMessage, opts.replace) : tr("Grambot.conversation.invalid_error", "Invalid input. Try again.");
                 currentPrompt = `${err}\n\n${translatedQuestion}`;
                 isError = true;
                 continue;
@@ -304,7 +304,7 @@ export function createConversationHelper(
         }
 
         if (opts.validate && !(await opts.validate(raw as unknown as T))) {
-            const err = opts.errorMessage ? tr(opts.errorMessage, opts.errorMessage, opts.replace) : tr("telebot.conversation.invalid_error", "Invalid input. Try again.");
+            const err = opts.errorMessage ? tr(opts.errorMessage, opts.errorMessage, opts.replace) : tr("Grambot.conversation.invalid_error", "Invalid input. Try again.");
             currentPrompt = `${err}\n\n${translatedQuestion}`;
             isError = true;
             continue;
@@ -391,7 +391,7 @@ export function createConversationHelper(
       lastMessageId = undefined;
       const conv = conversation as any;
       if (conv.session) {
-        conv.session.__telebot_last_msg_id = undefined;
+        conv.session.__Grambot_last_msg_id = undefined;
       }
     }
   }

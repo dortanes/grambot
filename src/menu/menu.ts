@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import type {
   LayoutBuilderInterface,
   MenuRef,
-  TelebotContext,
+  GrambotContext,
 } from "../types.js";
 import { LayoutBuilder } from "./layout.js";
 
@@ -31,11 +31,11 @@ export function getGlobalMenus(): MenuRef[] {
  * @returns A {@link MenuRef} object.
  */
 export function createMenu(
-  builder: (layout: LayoutBuilderInterface, ctx: TelebotContext) => void | Promise<void>,
+  builder: (layout: LayoutBuilderInterface, ctx: GrambotContext) => void | Promise<void>,
   options?: { id?: string },
 ): MenuRef {
   const ref: MenuRef = {
-    __telebot_menu: true,
+    __Grambot_menu: true,
     id: options?.id ?? `m${randomUUID().slice(0, 6)}`,
     builder,
     triggers: {},
@@ -76,7 +76,7 @@ export function createMenu(
  * Compile a MenuRef into a LayoutBuilder (runs the builder function).
  * @internal
  */
-export async function compileMenu(ref: MenuRef, ctx: TelebotContext): Promise<LayoutBuilder> {
+export async function compileMenu(ref: MenuRef, ctx: GrambotContext): Promise<LayoutBuilder> {
   const layout = new LayoutBuilder();
   await ref.builder(layout, ctx);
   return layout;

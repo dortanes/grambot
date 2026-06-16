@@ -1,6 +1,6 @@
 {
-  "name": "@superpackages/telebot",
-  "version": "1.0.6",
+  "name": "grambot",
+  "version": "1.0.0",
   "description": "A framework for easily building push-button Telegram bots. From the simplest to the most complex.",
   "type": "module",
   "exports": {
@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dortanes/telebot.git"
+    "url": "git+https://github.com/dortanes/grambot.git"
   },
   "keywords": [
     "telegram",
@@ -32,9 +32,9 @@
   "author": "dortanes",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dortanes/telebot/issues"
+    "url": "https://github.com/dortanes/grambot/issues"
   },
-  "homepage": "https://github.com/dortanes/telebot#readme",
+  "homepage": "https://github.com/dortanes/grambot#readme",
   "devDependencies": {
     "@types/node": "^20.0.0",
     "tsx": "^4.21.0",

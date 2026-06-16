@@ -4,14 +4,14 @@ Actions are the functional units of your bot. They can be attached to menu butto
 
 ## Types of Actions
 
-Telebot distinguishes between two types of actions based on how they are defined:
+Grambot distinguishes between two types of actions based on how they are defined:
 
 ### 1. Conversational Actions (Async)
 
 Defined using an `async` function. These actions have access to the `conversation` helper, allowing them to wait for user input.
 
 ```ts
-const myAction = Telebot.action(async ({ conversation, layout }) => {
+const myAction = Grambot.action(async ({ conversation, layout }) => {
   const name = await conversation.ask("What is your name?");
   layout.text(`Hello, ${name}!`);
   layout.button("Back").menu(mainMenu);
@@ -34,20 +34,20 @@ You can make actions accessible via global input triggers. When triggered global
 
 ```ts
 // Triggered by /start
-const startAction = Telebot.command("start").action(...);
+const startAction = Grambot.command("start").action(...);
 
 // Triggered by "Help" text
-const helpAction = Telebot.word("Help").action(...);
+const helpAction = Grambot.word("Help").action(...);
 
 // Triggered by regex with capture groups
-const userAction = Telebot.regexp(/user_(\d+)/).action(async ({ payload }) => {
+const userAction = Grambot.regexp(/user_(\d+)/).action(async ({ payload }) => {
   // payload.id will contain the captured group
   console.log(payload.id);
 });
 
 ## Automatic Registration
 
-By default, Telebot **automatically registers** all actions created using `Telebot.action()`, `Telebot.command()`, etc.
+By default, Grambot **automatically registers** all actions created using `Grambot.action()`, `Grambot.command()`, etc.
 
 You don't need to manually link them to a menu for them to work. This ensures that any deep-linked action or global trigger is reachable from any state of the bot.
 ```
@@ -58,7 +58,7 @@ Every action handler receives a context object:
 
 | Property       | Description                                                         |
 | :------------- | :------------------------------------------------------------------ |
-| `ctx`          | The standard Grammy `TelebotContext`.                               |
+| `ctx`          | The standard Grammy `GrambotContext`.                               |
 | `payload`      | Data passed from the button's `.payload()` or regex capture groups. |
 | `id`           | Shorthand for payload ID or button ID.                              |
 | `conversation` | Helper for `ask()` and `form()` (Conversational actions only).      |
@@ -68,13 +68,13 @@ Every action handler receives a context object:
 
 ## Payloads
 
-Payloads are JSON-serializable objects. When you use `.payload({ id: 1 })` on a button, Telebot encodes this data into the callback query.
+Payloads are JSON-serializable objects. When you use `.payload({ id: 1 })` on a button, Grambot encodes this data into the callback query.
 
 > [!WARNING]
 > **Callback Data Size Limit (64 Bytes)**
 > Telegram restricts callback data (the internal string sent by buttons) to exactly **64 bytes**.
 >
-> Telebot automatically optimizes this by:
+> Grambot automatically optimizes this by:
 >
 > - Using extremely short prefixes (`a:`, `n:`, `p:`, etc.).
 > - Using raw strings for single-ID payloads (e.g., `{id: "123"}` becomes just `123`).

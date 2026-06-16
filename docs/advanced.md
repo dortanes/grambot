@@ -1,15 +1,15 @@
 # Advanced Patterns
 
-This guide covers advanced configuration and architectural patterns for complex Telebot applications.
+This guide covers advanced configuration and architectural patterns for complex Grambot applications.
 
 ## Custom Session Storage
 
-By default, Telebot uses an in-memory session. For production, you should use a persistent store (Redis, MongoDB, PostgreSQL) via Grammy's storage adapters.
+By default, Grambot uses an in-memory session. For production, you should use a persistent store (Redis, MongoDB, PostgreSQL) via Grammy's storage adapters.
 
 ```ts
 import { FileAdapter } from "@grammyjs/storage-file";
 
-const bot = Telebot.create({
+const bot = Grambot.create({
   token: "...",
   menu: rootMenu,
   sessionStorage: new FileAdapter({ dirName: "./sessions" }),
@@ -21,7 +21,7 @@ const bot = Telebot.create({
 If your bot relies on a database, you can use `resolveUser` to automatically fetch user data and attach it to `ctx.user` for every update.
 
 ```ts
-const bot = Telebot.create({
+const bot = Grambot.create({
   token: "...",
   menu: rootMenu,
   resolveUser: async (ctx) => {
@@ -32,17 +32,17 @@ const bot = Telebot.create({
 });
 
 // Now accessible in any action:
-const adminAction = Telebot.action(async ({ ctx }) => {
+const adminAction = Grambot.action(async ({ ctx }) => {
   if (ctx.user.isAdmin) { ... }
 });
 ```
 
 ## Localization and Translation
 
-Telebot provides a `translator` hook to localize internal strings (like "Back" and "Cancel" buttons) or your own menu text.
+Grambot provides a `translator` hook to localize internal strings (like "Back" and "Cancel" buttons) or your own menu text.
 
 ```ts
-const bot = Telebot.create({
+const bot = Grambot.create({
   token: "...",
   menu: rootMenu,
   translator: (key, ctx) => {
@@ -54,19 +54,19 @@ const bot = Telebot.create({
 
 ### Predefined Keys
 
-Telebot looks for these keys during rendering:
+Grambot looks for these keys during rendering:
 
-- `telebot.back`: The "Back" button label.
-- `telebot.cancel`: The "Cancel" button label.
-- `telebot.conversation.use_buttons`: Warning when a user types instead of clicking a button during a choice prompt.
-- `telebot.conversation.photo_error`: Error message for invalid photo input.
+- `grambot.back`: The "Back" button label.
+- `grambot.cancel`: The "Cancel" button label.
+- `grambot.conversation.use_buttons`: Warning when a user types instead of clicking a button during a choice prompt.
+- `grambot.conversation.photo_error`: Error message for invalid photo input.
 
-## TelebotApp Instance
+## GrambotApp Instance
 
-The `Telebot.create()` method returns a `TelebotApp` instance. This instance gives you direct access to the underlying Grammy `Bot` for advanced middleware or custom handlers.
+The `Grambot.create()` method returns a `GrambotApp` instance. This instance gives you direct access to the underlying Grammy `Bot` for advanced middleware or custom handlers.
 
 ```ts
-const app = Telebot.create({ ... });
+const app = Grambot.create({ ... });
 
 // Access the raw Grammy bot
 app.bot.on("message:voice", (ctx) => {
@@ -81,9 +81,9 @@ app.start();
 Sometimes you need to send a menu "out of band" (e.g., in response to a background job or a custom event).
 
 ```ts
-import { sendMenu } from "@superpackages/telebot";
+import { sendMenu } from "grambot";
 
-const app = Telebot.create({ ... });
+const app = Grambot.create({ ... });
 
 // Manually send a menu to a specific user
 await sendMenu(app.bot, userChatId, someMenuRef, ctx);

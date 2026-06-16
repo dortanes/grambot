@@ -22,7 +22,7 @@ export type LayoutElement =
   | { kind: "refresh"; label: string };
 
 /**
- * LayoutBuilder — the DSL object passed to `Telebot.menu(layout => { ... })`.
+ * LayoutBuilder — the DSL object passed to `Grambot.menu(layout => { ... })`.
  *
  * Collects declarative descriptions and stores them. The engine
  * later compiles these into real Grammy inline keyboards and handlers.

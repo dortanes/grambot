@@ -1,13 +1,13 @@
 # Conversations and Forms
 
-Telebot makes it easy to collect information from users using linear conversations. Under the hood, it uses `@grammyjs/conversations` but provides a simplified `ask()` and `form()` API designed specifically for the "Single Message Flow".
+Grambot makes it easy to collect information from users using linear conversations. Under the hood, it uses `@grammyjs/conversations` but provides a simplified `ask()` and `form()` API designed specifically for the "Single Message Flow".
 
 ## Defining a Conversational Action
 
-A conversational action is any `async` action handler. When an async action is triggered, Telebot enters a conversation state for that chat.
+A conversational action is any `async` action handler. When an async action is triggered, Grambot enters a conversation state for that chat.
 
 ```ts
-const feedbackAction = Telebot.action(async ({ conversation, ui }) => {
+const feedbackAction = Grambot.action(async ({ conversation, ui }) => {
   const name = await conversation.ask("What is your name?");
   await ui.toast(`Thanks, ${name}!`);
 });
@@ -84,7 +84,7 @@ await conversation.ask("prompt.welcome", {
 
 ## Non-blocking Prompts (`say`)
 
-Use `conversation.say()` to update the prompt text and buttons without pausing execution. Unlike `ask()`, buttons in `say()` support the full Telebot button API (actions, navigation, URLs).
+Use `conversation.say()` to update the prompt text and buttons without pausing execution. Unlike `ask()`, buttons in `say()` support the full Grambot button API (actions, navigation, URLs).
 
 ```ts
 await conversation.say("Done! Choice recorded.", (kb) => {
@@ -130,7 +130,7 @@ console.log(data.username, data.age);
 
 ## Single Message Flow
 
-To keep the chat clean, Telebot uses a "Single Message" approach:
+To keep the chat clean, Grambot uses a "Single Message" approach:
 
 1. When a conversation starts, it sends a prompt message.
 2. For every subsequent `ask()`, it **edits** that same message.
@@ -142,7 +142,7 @@ To keep the chat clean, Telebot uses a "Single Message" approach:
 Every `ask()` prompt automatically includes a **"🚫 Cancel"** button.
 
 - If the user clicks it, the `ask()` or `form()` call returns `undefined` (or throws an internal error that returns the user to the previous menu).
-- Telebot catches this and automatically returns the user to the previous menu.
+- Grambot catches this and automatically returns the user to the previous menu.
 - You can manually check for `undefined` if you need to perform cleanup:
 
 ```ts

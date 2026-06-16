@@ -75,7 +75,7 @@ export class ButtonBuilder implements ButtonBuilderInterface {
    * Attach an action handler.
    * 
    * Accepts:
-   * - An `ActionRef` (created via `Telebot.action`)
+   * - An `ActionRef` (created via `Grambot.action`)
    * - An inline async/sync function
    * - A simple `() => void` for client-side only changes? (No, usually needs context)
    * 
@@ -178,6 +178,6 @@ export function isActionRef(value: unknown): value is ActionRef<any> {
   return (
     typeof value === "object" &&
     value !== null &&
-    (value as any).__telebot_action === true
+    (value as any).__Grambot_action === true
   );
 }

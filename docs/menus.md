@@ -1,15 +1,15 @@
 # Menus and Navigation
 
-Telebot provides a declarative API for building nested menu structures with automatic "Back" navigation and pagination.
+Grambot provides a declarative API for building nested menu structures with automatic "Back" navigation and pagination.
 
 ## Creating a Menu
 
-Menus are created using `Telebot.menu()`. You provide a builder function that uses a fluent `LayoutBuilder` to define the message text and buttons.
+Menus are created using `Grambot.menu()`. You provide a builder function that uses a fluent `LayoutBuilder` to define the message text and buttons.
 
 ```ts
-import { Telebot } from "@superpackages/telebot";
+import { Grambot } from "grambot";
 
-const mainMenu = Telebot.menu((layout) => {
+const mainMenu = Grambot.menu((layout) => {
   // Add a header image
   layout.image("https://example.com/header.jpg");
 
@@ -25,7 +25,7 @@ const mainMenu = Telebot.menu((layout) => {
 Menu text supports variable interpolation using the `.replace()` method.
 
 ```ts
-Telebot.menu((layout, ctx) => {
+Grambot.menu((layout, ctx) => {
   layout.text("Hello, {name}!").replace({ name: ctx.user.firstName });
 });
 ```
@@ -35,7 +35,7 @@ Telebot.menu((layout, ctx) => {
 You can include a header image in your menu using `layout.image(url)`.
 
 - If an image is present, the menu will be sent as a **Photo Message**, with the `layout.text` as the caption.
-- Telebot automatically handles transitions:
+- Grambot automatically handles transitions:
   - Switching between two menus with images will **edit the media** (smooth transition).
   - Switching from an image menu to a text-only menu (or vice versa) will **delete the previous message** and send a new one of the correct type to maintain the "single-message" user experience.
 
@@ -45,7 +45,7 @@ The `layout.button(label)` method returns a `ButtonBuilder` with several configu
 
 ### Navigation & Actions
 
-- `.menu(menuRef)`: Opens another menu. Telebot automatically tracks the navigation stack and adds a "Back" button.
+- `.menu(menuRef)`: Opens another menu. Grambot automatically tracks the navigation stack and adds a "Back" button.
 - `.navigate(menuRef)`: Shorthand alias for `.menu()`.
 - `.action(handler)`: Triggers a logic handler.
   - If the handler is **async**, it becomes a **Conversational Action** (can use `conversation.ask()`).
@@ -69,10 +69,10 @@ The `layout.button(label)` method returns a `ButtonBuilder` with several configu
 
 ## Button Styling
 
-Telebot supports colored buttons and custom emoji icons, introduced in Telegram Bot API 9.4 (February 2026).
+Grambot supports colored buttons and custom emoji icons, introduced in Telegram Bot API 9.4 (February 2026).
 
 ```ts
-Telebot.menu((layout) => {
+Grambot.menu((layout) => {
   layout.text("Are you sure you want to delete?");
 
   layout.button("✅ Yes, delete").danger().action(deleteAction);
@@ -104,10 +104,10 @@ bot.on("message", (ctx) => {
 
 ## Layout & Rows
 
-By default, Telebot places buttons in rows according to the `maxPerRow` setting.
+By default, Grambot places buttons in rows according to the `maxPerRow` setting.
 
 ```ts
-Telebot.menu((layout) => {
+Grambot.menu((layout) => {
   layout.maxPerRow(2); // Global limit for this menu
 
   layout.button("Line 1 - A");
@@ -132,7 +132,7 @@ layout
   );
 ```
 
-Telebot automatically handles:
+Grambot automatically handles:
 
 - Partitioning the items into pages.
 - Adding "⬅️ 1/3 ➡️" controls.
@@ -146,4 +146,4 @@ Telebot automatically handles:
 
 ### Back Button
 
-The "◀️ Back" button is added automatically to any menu opened via `.menu()`. You can customize its label globally in the `Telebot.create()` configuration via the `translator` hook.
+The "◀️ Back" button is added automatically to any menu opened via `.menu()`. You can customize its label globally in the `Grambot.create()` configuration via the `translator` hook.

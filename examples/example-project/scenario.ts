@@ -1,4 +1,4 @@
-import { Telebot } from "../../src/index.js";
+import { Grambot } from "../../src/index.js";
 
 /**
  * 1. Typed Action with Regexp Trigger
@@ -6,14 +6,14 @@ import { Telebot } from "../../src/index.js";
  * The engine automatically extracts capture groups as payload.
  * Matches: "star 123", "STAR 42"
  */
-const starAction = Telebot.regexp(/star (\d+)/i).action<{ id: number }>(async ({ ctx, payload }) => {
+const starAction = Grambot.regexp(/star (\d+)/i).action<{ id: number }>(async ({ ctx, payload }) => {
   await ctx.reply(`Selected star ID: ${payload.id}`);
 });
 
 /**
  * 1.1 Action for Admin Reset
  */
-const resetAction = Telebot.action(async ({ ui }) => {
+const resetAction = Grambot.action(async ({ ui }) => {
   await ui.alert("This would reset everything!");
 });
 
@@ -21,7 +21,7 @@ const resetAction = Telebot.action(async ({ ui }) => {
  * 2. Wizard-style Conversation with Word Trigger
  * Matches the exact phrase "buy star".
  */
-const buyStarAction = Telebot.word("buy star").action(async ({ ctx, conversation }) => {
+const buyStarAction = Grambot.word("buy star").action(async ({ ctx, conversation }) => {
   // Input validation for a numeric type
   const amount = await conversation.ask<number>("How many stars would you like to buy?", {
     type: "number",
@@ -42,7 +42,7 @@ const buyStarAction = Telebot.word("buy star").action(async ({ ctx, conversation
  * 3. Form-based Conversation with Command Trigger
  * Triggered via /register command.
  */
-const registerAction = Telebot.command('register').action(async ({ ctx, conversation, ui }) => {
+const registerAction = Grambot.command('register').action(async ({ ctx, conversation, ui }) => {
   // Quick feedback via Telegram toast (callback query answer)
   await ui.toast("Starting registration... ❤️");
 
@@ -68,7 +68,7 @@ const registerAction = Telebot.command('register').action(async ({ ctx, conversa
  * 4. Dynamic Lists with multiple triggers
  * Triggered via /stars command or "buy.stars" internal state.
  */
-const starsMenu = Telebot.command('stars').regexp(/^buy\.stars$/).menu(layout => {
+const starsMenu = Grambot.command('stars').regexp(/^buy\.stars$/).menu(layout => {
   layout.text("<i>Browse</i> available stars below:").parseAs("HTML");
 
   // Generate a dynamic list of items
@@ -90,7 +90,7 @@ const starsMenu = Telebot.command('stars').regexp(/^buy\.stars$/).menu(layout =>
     .action(resetAction);
 
   // Nested menu demonstration
-  layout.button("Options").menu(Telebot.menu(menu => {
+  layout.button("Options").menu(Grambot.menu(menu => {
     menu.button("Option A").action(() => {
       menu.text("<b>Option A</b> selected").parseAs("HTML");
     });
@@ -105,7 +105,7 @@ const starsMenu = Telebot.command('stars').regexp(/^buy\.stars$/).menu(layout =>
  * 5. Tabbed Navigation Pattern
  * Demonstrates how to create a menu that acts like tabs.
  */
-const infoMenu = Telebot.command('info').menu(layout => {
+const infoMenu = Grambot.command('info').menu(layout => {
   // .default() ensures this text/view is shown first
   layout.button("🏢 About Us").default().action(() => {
     layout.text("We are a leading developer of high-performance Telegram bots.");
@@ -123,7 +123,7 @@ const infoMenu = Telebot.command('info').menu(layout => {
  * 6. Auto-refreshing Menus
  * Demonstrates dynamic content updates within a menu.
  */
-const timeMenu = Telebot.menu(layout => {
+const timeMenu = Grambot.menu(layout => {
   layout.text(`Current server time: ${new Date().toLocaleTimeString()}`);
   layout.refreshButton("Sync Time");
 });
@@ -132,18 +132,18 @@ const timeMenu = Telebot.menu(layout => {
  * Main Scenario Entry Point
  * Demonstrates grid layout configurations and dynamic labels.
  */
-export default Telebot.menu(layout => {
+export default Grambot.menu(layout => {
   layout.maxPerRow(2); // Maximum of 2 buttons per row
 
   // Image
   layout.image("https://static.vecteezy.com/system/resources/thumbnails/050/393/628/small/cute-curious-gray-and-white-kitten-in-a-long-shot-photo.jpg")
 
   // Text
-  layout.text("Welcome to the <b>Telebot</b> Example Scenario!\nSelect an option below to explore.")
+  layout.text("Welcome to the <b>Grambot</b> Example Scenario!\nSelect an option below to explore.")
     .parseAs("HTML");
 
   // Navigation to sub-menus
-  layout.button("My Stars").id("stars").menu(starsMenu);
+  layout.button("My Stars").id("stars").menu(starsMenu).style('primary');
 
   layout.button("Registration")
     .id("register")
@@ -166,5 +166,5 @@ export default Telebot.menu(layout => {
 
   layout.button("Live Time")
     .id("time")
-    .menu(timeMenu);
+    .menu(timeMenu).style('success').icon('5318783359294382499')
 });

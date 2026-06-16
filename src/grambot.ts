@@ -4,24 +4,24 @@ import type {
   ActionRef,
   LayoutBuilderInterface,
   MenuRef,
-  TelebotConfig,
-  TelebotContext,
+  GrambotConfig,
+  GrambotContext,
 } from "./types.js";
 import { createAction } from "./action/action.js";
 import { createMenu } from "./menu/menu.js";
 import { installMenu, sendMenu } from "./engine/engine.js";
 
 /**
- * # Telebot
+ * # Grambot
  *
  * The main entry-point for building Telegram bots declaratively.
  *
  * ### Quick Start
  * ```ts
- * import { Telebot } from "@superpackages/telebot";
+ * import { Grambot } from "grambot";
  * import mainMenu from "./menus/main.js";
  *
- * const bot = Telebot.create({
+ * const bot = Grambot.create({
  *   token: process.env.BOT_TOKEN!,
  *   menu: mainMenu,
  * });
@@ -32,7 +32,7 @@ import { installMenu, sendMenu } from "./engine/engine.js";
 
 /**
  * Helper to build actions or menus attached to specific triggers.
- * Used internally by the {@link Telebot} class.
+ * Used internally by the {@link Grambot} class.
  */
 class TriggerBuilder {
   private triggers: { commands?: string[]; words?: string[]; regexps?: RegExp[] } = {};
@@ -90,7 +90,7 @@ class TriggerBuilder {
    * @param options - Optional menu settings.
    * @returns A {@link MenuRef} that can be used or sent.
    */
-  menu(builder: (layout: LayoutBuilderInterface, ctx: TelebotContext) => void | Promise<void>, options?: { id?: string }): MenuRef {
+  menu(builder: (layout: LayoutBuilderInterface, ctx: GrambotContext) => void | Promise<void>, options?: { id?: string }): MenuRef {
     const ref = createMenu(builder, options);
     ref.triggers = { ...this.triggers };
     return ref;
@@ -102,7 +102,7 @@ class TriggerBuilder {
  * 
  * Provides static methods to create triggers, actions, and menus.
  */
-export class Telebot {
+export class Grambot {
   /**
    * Create a trigger based on a command (e.g., `/start`).
    * @param name - The command name.
@@ -140,7 +140,7 @@ export class Telebot {
    * @param builder - A layout builder function.
    * @param options - Optional configuration (e.g., fixed ID).
    */
-  static menu(builder: (layout: LayoutBuilderInterface, ctx: TelebotContext) => void | Promise<void>, options?: { id?: string }): MenuRef {
+  static menu(builder: (layout: LayoutBuilderInterface, ctx: GrambotContext) => void | Promise<void>, options?: { id?: string }): MenuRef {
     return createMenu(builder, options);
   }
 
@@ -148,39 +148,39 @@ export class Telebot {
    * Create a fully configured bot instance.
    * @param options - Configuration including token and root menu.
    */
-  static create(options: TelebotConfig & { menu: MenuRef }): TelebotApp {
-    return new TelebotApp(options);
+  static create(options: GrambotConfig & { menu: MenuRef }): GrambotApp {
+    return new GrambotApp(options);
   }
 }
 
 /**
  * A running bot instance with the menu tree installed.
  * 
- * Created via {@link Telebot.create}.
+ * Created via {@link Grambot.create}.
  */
-export class TelebotApp {
+export class GrambotApp {
   /** The underlying grammy bot instance. */
-  readonly bot: Bot<TelebotContext>;
-  private readonly config: TelebotConfig;
+  readonly bot: Bot<GrambotContext>;
+  private readonly config: GrambotConfig;
   private readonly rootMenu: MenuRef;
 
   private readonly installPromise: Promise<void>;
 
   /**
-   * @internal Use {@link Telebot.create} instead.
+   * @internal Use {@link Grambot.create} instead.
    */
-  constructor(options: TelebotConfig & { menu: MenuRef }) {
+  constructor(options: GrambotConfig & { menu: MenuRef }) {
     this.config = options;
     this.rootMenu = options.menu;
-    this.bot = new Bot<TelebotContext>(options.token);
+    this.bot = new Bot<GrambotContext>(options.token);
 
     // Global error boundary — prevents crashes from Grammy/Telegram API errors
-    this.bot.catch((err: BotError<TelebotContext>) => {
+    this.bot.catch((err: BotError<GrambotContext>) => {
       const e = err.error;
       if (options.onError) {
         options.onError(e, err.ctx);
       } else {
-        console.error("[Telebot] Unhandled error:", e);
+        console.error("[Grambot] Unhandled error:", e);
       }
     });
 
@@ -192,7 +192,7 @@ export class TelebotApp {
    */
   async start(): Promise<void> {
     await this.installPromise;
-    console.log("🤖 Telebot started");
+    console.log("🤖 Grambot started");
     await this.bot.start({
       onStart: () => {},
       drop_pending_updates: true,
@@ -204,7 +204,7 @@ export class TelebotApp {
    * @param chatId - The recipient chat ID.
    * @param ctx - The current context.
    */
-  async sendMenu(chatId: number, ctx: TelebotContext): Promise<void> {
+  async sendMenu(chatId: number, ctx: GrambotContext): Promise<void> {
     await sendMenu(this.bot, chatId, this.rootMenu, ctx, this.config.translator);
   }
 
