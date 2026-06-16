@@ -34,6 +34,7 @@ export type {
   DynamicLabel,
   ButtonConfig,
   ButtonActionHandler,
+  ButtonStyle,
   LayoutBuilderInterface,
   ButtonBuilderInterface,
   ListBuilderInterface,

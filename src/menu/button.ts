@@ -1,6 +1,7 @@
 import type {
   ButtonConfig,
   ButtonBuilderInterface,
+  ButtonStyle,
   GuardFn,
   DynamicLabel,
   ButtonActionHandler,
@@ -120,6 +121,51 @@ export class ButtonBuilder implements ButtonBuilderInterface {
    */
   default(): this {
     this._config.isDefault = true;
+    return this;
+  }
+
+  /**
+   * Set a color style for this button.
+   * Available styles: "danger" (red), "success" (green), "primary" (blue).
+   * Requires Telegram Bot API 9.4+ (supported in Telegram clients from Feb 2026).
+   */
+  style(value: ButtonStyle): this {
+    this._config.style = value;
+    return this;
+  }
+
+  /**
+   * Shorthand for `.style("danger")` — renders a red button.
+   * Ideal for destructive actions like delete, ban, cancel.
+   */
+  danger(): this {
+    return this.style("danger");
+  }
+
+  /**
+   * Shorthand for `.style("success")` — renders a green button.
+   * Ideal for confirmations like confirm, pay, accept.
+   */
+  success(): this {
+    return this.style("success");
+  }
+
+  /**
+   * Shorthand for `.style("primary")` — renders a blue button.
+   * Ideal for primary/highlighted actions.
+   */
+  primary(): this {
+    return this.style("primary");
+  }
+
+  /**
+   * Set a custom emoji icon to display before the button text.
+   * The custom emoji must be owned by the bot's owner (Premium).
+   * Requires Telegram Bot API 9.4+.
+   * @param customEmojiId - Unique identifier of the custom emoji.
+   */
+  icon(customEmojiId: string): this {
+    this._config.iconCustomEmojiId = customEmojiId;
     return this;
   }
 }

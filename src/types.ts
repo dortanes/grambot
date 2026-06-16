@@ -56,6 +56,9 @@ export type TelebotConversation = Conversation<TelebotContext, TelebotContext>;
 /** Message parse modes supported by Telegram */
 export type ParseMode = "HTML" | "Markdown" | "MarkdownV2";
 
+/** Button color styles supported by Telegram Bot API 9.4+ */
+export type ButtonStyle = "danger" | "success" | "primary";
+
 // ─── Conversation ──────────────────────────────────────────────────────────────
 
 /** Types of input that can be requested from the user */
@@ -245,6 +248,10 @@ export interface ButtonConfig {
   payload?: Record<string, unknown>;
   /** If true, this action is triggered if no other buttons match (for text/regex) */
   isDefault?: boolean;
+  /** Button color style (danger=red, success=green, primary=blue). Requires Bot API 9.4+ */
+  style?: ButtonStyle;
+  /** Custom emoji icon ID displayed before the button text. Requires Bot API 9.4+ */
+  iconCustomEmojiId?: string;
 }
 
 /** A reference to a registered menu */
@@ -324,6 +331,16 @@ export interface ButtonBuilderInterface {
   payload<P extends Record<string, unknown>>(data: P): ButtonBuilderInterface;
   /** Mark as the default action for this menu */
   default(): ButtonBuilderInterface;
+  /** Set a button color style (danger=red, success=green, primary=blue) */
+  style(value: ButtonStyle): ButtonBuilderInterface;
+  /** Shorthand for .style("danger") — red button */
+  danger(): ButtonBuilderInterface;
+  /** Shorthand for .style("success") — green button */
+  success(): ButtonBuilderInterface;
+  /** Shorthand for .style("primary") — blue button */
+  primary(): ButtonBuilderInterface;
+  /** Set a custom emoji icon displayed before the button text */
+  icon(customEmojiId: string): ButtonBuilderInterface;
 }
 
 /** Interface for configuring a paginated list */

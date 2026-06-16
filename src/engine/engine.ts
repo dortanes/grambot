@@ -8,6 +8,7 @@ import type {
   MenuRef,
   ActionRef,
   ButtonConfig,
+  ButtonStyle,
   GuardFn,
   ParseMode,
   Translator,
@@ -49,6 +50,22 @@ function resolveLabel(config: ButtonConfig, ctx: TelebotContext, translator?: Tr
 async function passesGuard(guard: GuardFn | undefined, ctx: TelebotContext): Promise<boolean> {
   if (!guard) return true;
   return guard(ctx);
+}
+
+// ─── Apply button style and icon ───────────────────────────────────────────────
+
+/** @internal */
+function applyButtonStyling(
+  keyboard: InlineKeyboard,
+  style?: ButtonStyle,
+  iconCustomEmojiId?: string,
+): void {
+  if (style) {
+    keyboard.style(style);
+  }
+  if (iconCustomEmojiId) {
+    keyboard.icon(iconCustomEmojiId);
+  }
 }
 
 // ─── Collect all ActionRefs and MenuRefs recursively ───────────────────────────
@@ -199,6 +216,7 @@ async function buildKeyboard(
         let cbData: string;
         if (cfg.url) {
           keyboard.url(label, cfg.url);
+          applyButtonStyling(keyboard, cfg.style, cfg.iconCustomEmojiId);
           currentRowCount++;
           break; // URL buttons don't have callback data
         } else if (cfg.inlineHandler) {
@@ -231,6 +249,7 @@ async function buildKeyboard(
         // User didn't ask for it, but scenarios often implies it. 
         // For now keep label as is.
         keyboard.text(label, cbData);
+        applyButtonStyling(keyboard, cfg.style, cfg.iconCustomEmojiId);
         currentRowCount++;
         break;
       }
@@ -284,6 +303,7 @@ async function buildKeyboard(
             cbData = `_:${menuId}:${btnId}`;
           }
           keyboard.text(label, cbData);
+          applyButtonStyling(keyboard, bcfg.style, bcfg.iconCustomEmojiId);
           colCount++;
         }
 
